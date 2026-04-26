@@ -12,14 +12,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(Customizer.withDefaults());
+		/*
+		 * http .csrf(csrf -> csrf.disable()) .headers(headers ->
+		 * headers.frameOptions(frame -> frame.disable())) .authorizeHttpRequests(auth
+		 * -> auth .requestMatchers("/h2-console/**").permitAll()
+		 * .anyRequest().authenticated() ) .formLogin(Customizer.withDefaults());
+		 */
+    	
+    	 http
+         .csrf(csrf -> csrf.disable())
+         .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+         .authorizeHttpRequests(auth -> auth
+             .anyRequest().permitAll() // for allow all api request without login
+         );
 
         return http.build();
     }
