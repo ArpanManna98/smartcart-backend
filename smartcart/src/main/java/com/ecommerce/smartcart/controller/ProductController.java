@@ -29,8 +29,17 @@ public class ProductController {
         return productService.saveProduct(dto);
     }
 
-    @GetMapping
-    public List<ProductDTO> getAllProducts() {
-        return productService.getAllProducts();
+	/*
+	 * @GetMapping public List<ProductDTO> getAllProducts() { return
+	 * productService.getAllProducts(); }
+	 */
+    
+    @GetMapping("/paged")
+    public List<ProductDTO> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+        return productService.getProducts(page, size, sortBy);
     }
 }

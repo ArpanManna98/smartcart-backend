@@ -8,5 +8,7 @@ public interface ProductService {
 
     ProductDTO saveProduct(ProductDTO dto);
 
-    List<ProductDTO> getAllProducts();
+  //  List<ProductDTO> getAllProducts();
+    
+    List<ProductDTO> getProducts(int page, int size, String sortBy);
 }

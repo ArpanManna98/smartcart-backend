@@ -26,6 +26,10 @@ import com.ecommerce.smartcart.entity.Product;
 import com.ecommerce.smartcart.repository.CategoryRepository;
 import com.ecommerce.smartcart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -76,12 +80,38 @@ public class ProductServiceImpl implements ProductService {
 
         return response;
     }
+    
+	/*
+	 * @Override public List<ProductDTO> getAllProducts() {
+	 * 
+	 * List<Product> products = productRepository.findAll();
+	 * 
+	 * return products.stream().map(product -> {
+	 * 
+	 * ProductDTO dto = new ProductDTO(); dto.setId(product.getId());
+	 * dto.setName(product.getName()); dto.setPrice(product.getPrice());
+	 * dto.setDescription(product.getDescription());
+	 * 
+	 * if (product.getCategories() != null) { List<Long> categoryIds =
+	 * product.getCategories() .stream() .map(category -> category.getId())
+	 * .toList();
+	 * 
+	 * dto.setCategoryIds(categoryIds); }
+	 * 
+	 * return dto;
+	 * 
+	 * }).toList(); }
+	 */
+    
+    
     @Override
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductDTO> getProducts(int page, int size, String sortBy) {
 
-        List<Product> products = productRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
 
-        return products.stream().map(product -> {
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        return productPage.getContent().stream().map(product -> {
 
             ProductDTO dto = new ProductDTO();
             dto.setId(product.getId());
@@ -94,7 +124,6 @@ public class ProductServiceImpl implements ProductService {
                         .stream()
                         .map(category -> category.getId())
                         .toList();
-
                 dto.setCategoryIds(categoryIds);
             }
 
@@ -102,4 +131,6 @@ public class ProductServiceImpl implements ProductService {
 
         }).toList();
     }
+    
+    
 }
