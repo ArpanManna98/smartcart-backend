@@ -23,6 +23,7 @@ package com.ecommerce.smartcart.service;
 
 import com.ecommerce.smartcart.dto.ProductDTO;
 import com.ecommerce.smartcart.entity.Product;
+import com.ecommerce.smartcart.exception.ResourceNotFoundException;
 import com.ecommerce.smartcart.repository.CategoryRepository;
 import com.ecommerce.smartcart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +131,52 @@ public class ProductServiceImpl implements ProductService {
             return dto;
 
         }).toList();
+    }
+    
+    @Override
+    public ProductDTO updateProduct(Long id, ProductDTO dto) {
+
+    	Product product = productRepository.findById(id)
+    		    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        // update fields
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setDescription(dto.getDescription());
+
+        if (dto.getCategoryIds() != null) {
+            product.setCategories(
+                new HashSet<>(categoryRepository.findAllById(dto.getCategoryIds()))
+            );
+        }
+
+        Product updated = productRepository.save(product);
+
+        // convert to DTO
+        ProductDTO response = new ProductDTO();
+        response.setId(updated.getId());
+        response.setName(updated.getName());
+        response.setPrice(updated.getPrice());
+        response.setDescription(updated.getDescription());
+
+        if (updated.getCategories() != null) {
+            response.setCategoryIds(
+                updated.getCategories().stream()
+                        .map(cat -> cat.getId())
+                        .toList()
+            );
+        }
+
+        return response;
+    }
+    
+    @Override
+    public void deleteProduct(Long id) {
+
+    	Product product = productRepository.findById(id)
+    		    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        productRepository.delete(product);
     }
     
     
