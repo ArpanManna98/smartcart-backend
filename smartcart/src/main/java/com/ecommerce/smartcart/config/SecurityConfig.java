@@ -1,30 +1,45 @@
 package com.ecommerce.smartcart.config;
 
+import com.ecommerce.smartcart.security.JwtAuthFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		/*
-		 * http .csrf(csrf -> csrf.disable()) .headers(headers ->
-		 * headers.frameOptions(frame -> frame.disable())) .authorizeHttpRequests(auth
-		 * -> auth .requestMatchers("/h2-console/**").permitAll()
-		 * .anyRequest().authenticated() ) .formLogin(Customizer.withDefaults());
-		 */
-    	
-    	 http
-         .csrf(csrf -> csrf.disable())
-         .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-         .authorizeHttpRequests(auth -> auth
-             .anyRequest().permitAll() // for allow all api request without login
-         );
+        http
+                .csrf(csrf -> csrf.disable())
+
+                .headers(headers ->
+                        headers.frameOptions(frame -> frame.disable())
+                )
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(
+                                "/auth/**",
+                                "/h2-console/**"
+                        ).permitAll()
+
+                        .anyRequest().authenticated()
+                )
+
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
